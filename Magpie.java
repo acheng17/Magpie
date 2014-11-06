@@ -31,7 +31,11 @@ public class Magpie
  public String getResponse(String statement)
  {
   String response = "";
-  if (statement.indexOf("no") >= 0)
+  if (response.trim() == "    ") 
+  {
+    response = "Are you still there?";
+ }
+  else if (statement.indexOf("no") >= 0)
   {
    response = "Why so negative?";
   }
@@ -41,6 +45,31 @@ public class Magpie
     || statement.indexOf("brother") >= 0)
   {
    response = "Tell me more about your family.";
+  }
+  else if (statement.indexOf("dog") >= 0 
+            || statement.indexOf("cat") >= 0 )
+             {
+    response = "Tell me more about your pets.";
+  }
+ 
+  //it responds according to "no" first, replying "Why so negative?" To make it switched, I think 
+  //I have to code something so that it catches and react to the first order keyword, 
+  //in this case, dog and reply using "Tell me about your pets."
+  
+  else if (statement.indexOf("Mr. Kiang") >= 0
+             || statement.indexOf("Mr. Landgraf") >= 0)
+  {
+    response = "He sounds like a nice teacher.";
+  }
+  else if (statement.indexOf("hungry") >= 0
+             || statement.indexOf("food") >= 0)
+  {
+    response = "What kind of food do you like to eat?";
+  }
+  else if (statement.indexOf("computer") >= 0
+             || statement.indexOf("phone") >= 0)
+  {
+    response = "What do you usually do on that? Do you play any games?";
   }
   else
   {
@@ -55,7 +84,7 @@ public class Magpie
   */
  private String getRandomResponse()
  {
-  final int NUMBER_OF_RESPONSES = 4;
+  final int NUMBER_OF_RESPONSES = 6;
   double r = Math.random();
   int whichResponse = (int)(r * NUMBER_OF_RESPONSES);
   String response = "";
@@ -75,6 +104,14 @@ public class Magpie
   else if (whichResponse == 3)
   {
    response = "You don't say.";
+  }
+  else if (whichResponse == 4)
+  {
+    response = "I see.";
+  }
+  else if (whichResponse == 5)
+  {
+    response = "Keep going...";
   }
 
   return response;
