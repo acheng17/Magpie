@@ -71,7 +71,8 @@ public class Magpie
   {
     response = "What do you usually do on that? Do you play any games?";
   }
-  else if (findKeyword(statement, "I want to", 0) >= 0)
+  else if ((findKeyword(statement, "I want to", 0) >= 0)
+    ||findKeyword(statement, "I want", 0) >= 0)
   {
    response = transformIWantToStatement(statement);
   }
@@ -86,6 +87,15 @@ else
    {
     response = transformYouMeStatement(statement);
    }
+   
+   int abc = findKeyword(statement, "I", 0);
+   
+   if (abc >= 0
+         && findKeyword(statement, "I", abc) >= 0)
+         {
+    response = transformYouMeStatement(statement);
+   }
+       
    else
    {
     response = getRandomResponse();
