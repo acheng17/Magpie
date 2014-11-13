@@ -1,3 +1,4 @@
+import java.util.Random;
 /**
  * A program to carry on conversations with a human user.
  * This is the initial version that:  
@@ -35,19 +36,19 @@ public class Magpie
   {
     response = "Are you still there?";
  }
-  else if (statement.indexOf("no") >= 0)
+  else if (findKeyword(statement, "no", 0) >= 0)
   {
    response = "Why so negative?";
   }
-  else if (statement.indexOf("mother") >= 0
-    || statement.indexOf("father") >= 0
-    || statement.indexOf("sister") >= 0
-    || statement.indexOf("brother") >= 0)
+  else if ((findKeyword(statement, "mother", 0) >= 0)
+    || findKeyword(statement, "father", 0) >= 0
+    || findKeyword(statement, "sister", 0) >= 0
+    || findKeyword(statement, "brother", 0) >= 0)
   {
    response = "Tell me more about your family.";
   }
-  else if (statement.indexOf("dog") >= 0 
-            || statement.indexOf("cat") >= 0 )
+  else if ((findKeyword(statement, "dog", 0) >= 0)
+            || findKeyword(statement, "cat", 0) >= 0)
              {
     response = "Tell me more about your pets.";
   }
@@ -56,64 +57,204 @@ public class Magpie
   //I have to code something so that it catches and react to the first order keyword, 
   //in this case, dog and reply using "Tell me about your pets."
   
-  else if (statement.indexOf("Mr. Kiang") >= 0
-             || statement.indexOf("Mr. Landgraf") >= 0)
+  else if ((findKeyword(statement, "Mr. Kiang", 0) >= 0)
+             || findKeyword(statement, "Mr. Landgraf", 0) >= 0)
   {
     response = "He sounds like a nice teacher.";
   }
-  else if (statement.indexOf("hungry") >= 0
-             || statement.indexOf("food") >= 0)
+  else if ((findKeyword(statement, "hungry", 0) >= 0)
+             || findKeyword(statement, "food", 0) >= 0)
   {
     response = "What kind of food do you like to eat?";
   }
-  else if (statement.indexOf("computer") >= 0
-             || statement.indexOf("phone") >= 0)
+  else if ((findKeyword(statement, "computer", 0) >= 0
+             || findKeyword(statement, "phone", 0) >= 0))
   {
     response = "What do you usually do on that? Do you play any games?";
   }
-  else
+  else if (findKeyword(statement, "I want to", 0) >= 0)
   {
-   response = getRandomResponse();
+   response = transformIWantToStatement(statement);
   }
+  //  Part of student solution
+  else if (findKeyword(statement, "I want", 0) >= 0)
+  {
+   response = transformIWantStatement(statement);
+  }
+ else
+  {
+
+   // Look for a two word (you <something> me)
+   // pattern
+   int psn = findKeyword(statement, "you", 0);
+
+   if (psn >= 0
+     && findKeyword(statement, "me", psn) >= 0)
+   {
+    response = transformYouMeStatement(statement);
+   }
+   else
+   {
+    //  Part of student solution
+    // Look for a two word (I <something> you)
+    // pattern
+    psn = findKeyword(statement, "i", 0);
+
+    if (psn >= 0
+      && findKeyword(statement, "you", psn) >= 0)
+    {
+     response = transformIYouStatement(statement);
+    }
+   else
+   {
+    response = getRandomResponse();
+   }
+  }
+ }
   return response;
+ }
+ 
+ private String transformIWantToStatement(String statement)
+ {
+  //  Remove the final period, if there is one
+  statement = statement.trim();
+  String lastChar = statement.substring(statement
+    .length() - 1);
+  if (lastChar.equals("."))
+  {
+   statement = statement.substring(0, statement
+     .length() - 1);
+  }
+  int psn = findKeyword (statement, "I want to", 0);
+  String restOfStatement = statement.substring(psn + 9).trim();
+  return "What would it mean to " + restOfStatement + "?";
+ }
+
+ private String transformIWantStatement(String statement)
+ {
+  //  Remove the final period, if there is one
+  statement = statement.trim();
+  String lastChar = statement.substring(statement
+    .length() - 1);
+  if (lastChar.equals("."))
+  {
+   statement = statement.substring(0, statement
+     .length() - 1);
+  }
+  int psn = findKeyword (statement, "I want", 0);
+  String restOfStatement = statement.substring(psn + 6).trim();
+  return "Would you really be happy if you had " + restOfStatement + "?";
+ }
+  
+ /**
+  * Take a statement with "you <something> me" and transform it into 
+  * "What makes you think that I <something> you?"
+  * @param statement the user statement, assumed to contain "you" followed by "me"
+  * @return the transformed statement
+  */
+ private String transformYouMeStatement(String statement)
+ {
+  //  Remove the final period, if there is one
+  statement = statement.trim();
+  String lastChar = statement.substring(statement
+    .length() - 1);
+  if (lastChar.equals("."))
+  {
+   statement = statement.substring(0, statement
+     .length() - 1);
+  }
+  
+  int psnOfYou = findKeyword (statement, "you", 0);
+  int psnOfMe = findKeyword (statement, "me", psnOfYou + 3);
+  
+  String restOfStatement = statement.substring(psnOfYou + 3, psnOfMe).trim();
+  return "What makes you think that I " + restOfStatement + " you?";
+ }
+ 
+ private String transformIYouStatement(String statement)
+ {
+  //  Remove the final period, if there is one
+  statement = statement.trim();
+  String lastChar = statement.substring(statement
+    .length() - 1);
+  if (lastChar.equals("."))
+  {
+   statement = statement.substring(0, statement
+     .length() - 1);
+  }
+  
+  int psnOfI = findKeyword (statement, "I", 0);
+  int psnOfYou = findKeyword (statement, "you", psnOfI);
+  
+  String restOfStatement = statement.substring(psnOfI + 1, psnOfYou).trim();
+  return "Why do you " + restOfStatement + " me?";
  }
 
  /**
   * Pick a default response to use if nothing else fits.
   * @return a non-committal string
   */
- private String getRandomResponse()
+private String getRandomResponse ()
  {
-  final int NUMBER_OF_RESPONSES = 6;
-  double r = Math.random();
-  int whichResponse = (int)(r * NUMBER_OF_RESPONSES);
-  String response = "";
-  
-  if (whichResponse == 0)
+  Random r = new Random ();
+  return randomResponses [r.nextInt(randomResponses.length)];
+ }
+ 
+ private String [] randomResponses = {"Interesting, tell me more",
+   "Hmmm.",
+   "Do you really think so?",
+   "You don't say.",
+   "I see.",
+   "Keep going...",
+ };
+ 
+private int findKeyword(String statement, String goal,
+   int startPos)
+ {
+  String phrase = statement.trim();
+  // The only change to incorporate the startPos is in
+  // the line below
+  int psn = phrase.toLowerCase().indexOf(
+    goal.toLowerCase(), startPos);
+
+  // Refinement--make sure the goal isn't part of a
+  // word
+  while (psn >= 0)
   {
-   response = "Interesting, tell me more.";
-  }
-  else if (whichResponse == 1)
-  {
-   response = "Hmmm.";
-  }
-  else if (whichResponse == 2)
-  {
-   response = "Do you really think so?";
-  }
-  else if (whichResponse == 3)
-  {
-   response = "You don't say.";
-  }
-  else if (whichResponse == 4)
-  {
-    response = "I see.";
-  }
-  else if (whichResponse == 5)
-  {
-    response = "Keep going...";
+   // Find the string of length 1 before and after
+   // the word
+   String before = " ", after = " ";
+   if (psn > 0)
+   {
+    before = phrase.substring(psn - 1, psn)
+      .toLowerCase();
+   }
+   if (psn + goal.length() < phrase.length())
+   {
+    after = phrase.substring(
+      psn + goal.length(),
+      psn + goal.length() + 1)
+      .toLowerCase();
+   }
+
+   // If before and after aren't letters, we've
+   // found the word
+   if (((before.compareTo("a") < 0) || (before
+     .compareTo("z") > 0)) // before is not a
+           // letter
+     && ((after.compareTo("a") < 0) || (after
+       .compareTo("z") > 0)))
+   {
+    return psn;
+   }
+
+   // The last position didn't work, so let's find
+   // the next, if there is one.
+   psn = phrase.indexOf(goal.toLowerCase(),
+     psn + 1);
+
   }
 
-  return response;
+  return -1;
  }
 }
